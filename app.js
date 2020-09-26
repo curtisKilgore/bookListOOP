@@ -49,6 +49,13 @@ UI.prototype.showAlert = function (message, className) {
   }, 3000);
 };
 
+// Delete Book
+UI.prototype.deleteBook = function (target) {
+  if (target.className === "delete") {
+    target.parentElement.parentElement.remove();
+  }
+};
+
 // Add Clear Fields Method to UI Prototype
 UI.prototype.clearFields = function () {
   // Grab fields to clear
@@ -86,6 +93,20 @@ document.getElementById("book-form").addEventListener("submit", function (e) {
     // Clear fields
     ui.clearFields();
   }
+
+  e.preventDefault();
+});
+
+// Event Listener for Delete
+document.getElementById("book-list").addEventListener("click", function (e) {
+  // Instantiate UI
+  const ui = new UI();
+
+  // Delete book
+  ui.deleteBook(e.target);
+
+  // Show Message
+  ui.showAlert("Book Removed!", "success");
 
   e.preventDefault();
 });
