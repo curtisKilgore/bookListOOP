@@ -64,8 +64,7 @@ UI.prototype.clearFields = function () {
   document.getElementById("isbn").value = "";
 };
 
-// Event Listeners
-// Listener on the form. Listening for the submit
+// Event Listener on the form. Listening for the submit
 document.getElementById("book-form").addEventListener("submit", function (e) {
   // Get each field on submit
   const title = document.getElementById("title").value,
