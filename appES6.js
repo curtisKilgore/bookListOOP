@@ -24,18 +24,12 @@ class UI {
   }
 
   showAlert(message, className) {
-    // Create div
     const div = document.createElement("div");
-    // Add Classes
-    // Alert class used to remove it from DOM
+
     div.className = `alert ${className}`;
-    // Add Text
     div.appendChild(document.createTextNode(message));
-    // Get Parent (Use event delegation)
     const container = document.querySelector(".container");
-    // Get Form so alert can be before form
     const form = document.querySelector("#book-form");
-    // Inserting our alert div before the form
     container.insertBefore(div, form);
 
     // Remove Alert after 3 seconds
@@ -58,7 +52,55 @@ class UI {
   }
 }
 
-// Event Listener on the form. Listening for the submit
+// Local Storage Class
+class Store {
+  static getBooks() {
+    let books;
+    if (localStorage.getItem("books") === null) {
+      books = [];
+    } else {
+      //   JSON.parse takes the string from LS and turns it into an object
+      books = JSON.parse(localStorage.getItem("books"));
+    }
+    return books;
+  }
+
+  static displayBooks() {
+    const books = Store.getBooks();
+
+    books.forEach(function (book) {
+      const ui = new UI();
+
+      // Add book to UI
+      ui.addBookToList(book);
+    });
+  }
+
+  static addBook(book) {
+    const books = Store.getBooks();
+
+    books.push(book);
+
+    localStorage.setItem("books", JSON.stringify(books));
+  }
+
+  static removeBook(isbn) {
+    const books = Store.getBooks();
+
+    books.forEach(function (book, index) {
+      if (book.isbn === isbn) {
+        books.splice(index, 1);
+      }
+    });
+
+    // Set local storage again
+    localStorage.setItem("books", JSON.stringify(books));
+  }
+}
+
+// DOM Load Event
+document.addEventListener("DOMContentLoaded", Store.displayBooks);
+
 document.getElementById("book-form").addEventListener("submit", function (e) {
   // Get each field on submit
   const title = document.getElementById("title").value,
@@ -68,8 +110,7 @@ document.getElementById("book-form").addEventListener("submit", function (e) {
   // Instantiate book after collecting input values ^
   const book = new Book(title, author, isbn);
 
-  // Instantiate UI  Boject
-  // Create new book object so it can be added to the list
+  // Instantiate UI  Object
   const ui = new UI();
 
   //   Validate Submit
@@ -77,8 +118,10 @@ document.getElementById("book-form").addEventListener("submit", function (e) {
     // Error Alert
     ui.showAlert("Please fill in all fields", "error");
   } else {
-    // Add book to list
     ui.addBookToList(book);
+
+    // Add to local storage
+    Store.addBook(book);
 
     // Show Success
     ui.showAlert("Book Added!", "success");
@@ -97,6 +140,9 @@ document.getElementById("book-list").addEventListener("click", function (e) {
 
   // Delete book
   ui.deleteBook(e.target);
+
+  // Remove from local storage
+  Store.removeBook(e.target.parentElement.previousElementSibling.textContent);
 
   // Show Message
   ui.showAlert("Book Removed!", "success");
